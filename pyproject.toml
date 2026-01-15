@@ -1,0 +1,15 @@
+[project]
+name = "mlops-part2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.128.0",
+    "ipykernel>=7.1.0",
+    "matplotlib>=3.10.8",
+    "pandas>=2.3.3",
+    "parquet>=1.3.1",
+    "streamlit>=1.52.2",
+    "xgboost>=3.1.3",
+]
