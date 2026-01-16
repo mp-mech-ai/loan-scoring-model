@@ -15,20 +15,23 @@ def test_df_load():
 def test_predict_valid_data():
     payload = clean_row(df.sample(1))
 
-    response = client.post("/predict", data=payload)
-
-    print(response.json())
+    response = client.post("/predict", content=payload)
 
     assert "score" in response.json()
+    assert "time" in response.json()
     assert response.status_code == 200
 
-def test_predict_invalid_data():
-    response = client.post("/predict", json={})
+def test_predict_invalid_types():
+    response = client.post("/predict", json={"DAYS_BIRTH": "FOOBAR"})
+    assert response.status_code == 422
 
+def test_predict_invalid_value():
+    response = client.post("/predict", json={"DAYS_BIRTH": "2"})
     assert response.status_code == 422
 
 if __name__ == "__main__":
     test_df_load()
     test_predict_valid_data()
-    test_predict_invalid_data()
+    test_predict_invalid_types()
+    test_predict_invalid_value()
 
