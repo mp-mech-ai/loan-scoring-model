@@ -7,7 +7,7 @@ def clean_row(row):
     
     # Replace infinity values with NaN
     df_row = df_row.replace([np.inf, -np.inf], np.nan)
-    
+    df_row = df_row.astype('float64')
     # Convert to json
     return df_row.iloc[0].to_json()
     

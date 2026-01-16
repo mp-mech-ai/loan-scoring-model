@@ -1,97 +1,67 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
+import uvicorn
+from api.schemas import PredictionInput, PredictionOutput
 from pydantic import BaseModel
-from typing import Optional
-import pickle as pkl
-import pandas as pd
-import numpy as np
+from api.model import model_prediction, load_model
+from time import time
 
 app = FastAPI()
 
-
-class PredictionInput(BaseModel):
-    # External data sources (can be missing)
-    EXT_SOURCE_1: Optional[float] = None
-    EXT_SOURCE_2: Optional[float] = None
-    EXT_SOURCE_3: Optional[float] = None
-    DAYS_BIRTH: int
-    DAYS_REGISTRATION: Optional[float] = None
-    DAYS_ID_PUBLISH: int
-    DAYS_EMPLOYED: Optional[float] = None
-    DAYS_LAST_PHONE_CHANGE: Optional[float] = None
-    REGION_POPULATION_RELATIVE: Optional[float] = None
-    PAYMENT_RATE: Optional[float] = None
-    DAYS_EMPLOYED_PERC: Optional[float] = None
-    ANNUITY_INCOME_PERC: Optional[float] = None
-    INCOME_CREDIT_PERC: Optional[float] = None
-    INCOME_PER_PERSON: Optional[float] = None
-    AMT_ANNUITY: Optional[float] = None
-    ACTIVE_DAYS_CREDIT_UPDATE_MEAN: Optional[float] = None
-    ACTIVE_DAYS_CREDIT_ENDDATE_MIN: Optional[float] = None
-    INSTAL_DBD_MEAN: Optional[float] = None
-    INSTAL_DBD_MAX: Optional[float] = None
-    INSTAL_AMT_PAYMENT_MIN: Optional[float] = None
-
-
-class PredictionOutput(BaseModel):
-    score: float
-
-
-def load_model():
-    with open("models/xgboost_20cols.pkl", "rb") as f:
-        model = pkl.load(f)
-    return model
-
-
-def model_prediction(input_data: PredictionInput) -> float:
-    # Convert Pydantic model to dictionary
-    data_dict = input_data.model_dump()
-    
-    # Create DataFrame
-    df = pd.DataFrame([data_dict])
-    
-    # Reorder columns to match the model's expected feature order
-    COLUMNS = [
-        'EXT_SOURCE_2', 
-        'EXT_SOURCE_3',
-        'EXT_SOURCE_1',
-        'DAYS_BIRTH',
-        'DAYS_REGISTRATION',
-        'PAYMENT_RATE',
-        'DAYS_ID_PUBLISH',
-        'DAYS_EMPLOYED_PERC',
-        'DAYS_EMPLOYED',
-        'INSTAL_DBD_MEAN',
-        'ANNUITY_INCOME_PERC',
-        'DAYS_LAST_PHONE_CHANGE',
-        'AMT_ANNUITY',
-        'REGION_POPULATION_RELATIVE',
-        'INCOME_CREDIT_PERC',
-        'INSTAL_AMT_PAYMENT_MIN',
-        'INCOME_PER_PERSON',
-        'ACTIVE_DAYS_CREDIT_UPDATE_MEAN',
-        'INSTAL_DBD_MAX',
-        'ACTIVE_DAYS_CREDIT_ENDDATE_MIN'
-    ]
-    df = df[COLUMNS]
-    
-    # Convert all columns to numeric types
-    df = df.astype('float64')
-
-    # Get prediction
-    score = model.predict_proba(df)
-    
-    # Convert numpy float to Python float
-    return float(score[0][1])
-
-
 model = load_model()
 
+class Timer:
+    def __enter__(self):
+        self.start_time = time()
+        return self
 
-@app.post("/predict", response_model=PredictionOutput)
-async def predict(input_data: PredictionInput):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.end_time = time()
+        self.elapsed_time = self.end_time - self.start_time
+    
+
+@app.post(
+        "/predict", 
+        response_model=PredictionOutput
+)
+async def predict(input_data: PredictionInput) -> PredictionOutput:
     try:
-        score = model_prediction(input_data)
-        print("Score:", score)
-        return {"score": score}
+        with Timer() as timer:
+            score = model_prediction(input_data, model)
+
+        return {
+            "score": score,
+            "time": timer.elapsed_time
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+class HealthCheck(BaseModel):
+    """Response model to validate and return when performing a health check."""
+
+    status: str = "OK"
+
+
+@app.get(
+    "/health",
+    tags=["healthcheck"],
+    summary="Perform a Health Check",
+    response_description="Return HTTP Status Code 200 (OK)",
+    status_code=status.HTTP_200_OK,
+    response_model=HealthCheck,
+)
+def get_health() -> HealthCheck:
+    """
+    ## Perform a Health Check
+    Endpoint to perform a healthcheck on. This endpoint can primarily be used Docker
+    to ensure a robust container orchestration and management is in place. Other
+    services which rely on proper functioning of the API service will not deploy if this
+    endpoint returns any other HTTP status code except 200 (OK).
+    Returns:
+        HealthCheck: Returns a JSON response with the health status
+    """
+    return HealthCheck(status="OK")
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
