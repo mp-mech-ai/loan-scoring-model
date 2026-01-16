@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
-from mlops_part2.api import app
-from mlops_part2.data_cleaner import clean_row
+from api.main import app
+from api.data_cleaner import clean_row
 import pandas as pd
 
 client = TestClient(app)
