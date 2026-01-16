@@ -12,6 +12,10 @@ def test_df_load():
     assert isinstance(df, pd.DataFrame)
     assert len(df) > 0
 
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+
 def test_predict_valid_data():
     payload = clean_row(df.sample(1))
 
