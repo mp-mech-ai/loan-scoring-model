@@ -34,6 +34,9 @@ jobs:
           pip install uv
           uv sync
       - name: Test with pytest
+        env:
+          LOGTAIL_TOKEN: ${{ secrets.LOGTAIL_TOKEN }}
+          LOGTAIL_HOST: ${{ vars.LOGTAIL_HOST }}
         run: |
           uv run pytest
 
