@@ -46,6 +46,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build the Docker image
+        env:
+          LOGTAIL_TOKEN: ${{ secrets.LOGTAIL_TOKEN }}
+          LOGTAIL_HOST: ${{ vars.LOGTAIL_HOST }}
         run: docker build . --file Dockerfile --tag loan-scoring-api:$(date +%s)
 
   sync-to-hub:
