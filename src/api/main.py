@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 import uvicorn
-from api.schemas import PredictionInput, PredictionOutput
+from api.schemas import PredictionInput, PredictionOutput, HealthCheck
 from pydantic import BaseModel
 from api.model import model_prediction, load_model
 from time import time
@@ -17,7 +17,11 @@ class Timer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end_time = time()
         self.elapsed_time = self.end_time - self.start_time
-    
+
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Loan Scoring API!"}
 
 @app.post(
         "/predict", 
@@ -34,13 +38,6 @@ async def predict(input_data: PredictionInput) -> PredictionOutput:
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-
-class HealthCheck(BaseModel):
-    """Response model to validate and return when performing a health check."""
-
-    status: str = "OK"
-
 
 @app.get(
     "/health",

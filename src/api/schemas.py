@@ -27,3 +27,8 @@ class PredictionInput(BaseModel):
 class PredictionOutput(BaseModel):
     score: float
     time: float
+
+class HealthCheck(BaseModel):
+    """Response model to validate and return when performing a health check."""
+
+    status: str = "OK"
