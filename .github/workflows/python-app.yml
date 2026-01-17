@@ -44,3 +44,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag loan-scoring-api:$(date +%s)
+
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: git push https://poppybunny:$HF_TOKEN@huggingface.co/spaces/poppybunny/loan-scoring-model main
