@@ -1,13 +1,38 @@
 from fastapi import FastAPI, HTTPException, status
-import uvicorn
 from api.schemas import PredictionInput, PredictionOutput, HealthCheck
-from pydantic import BaseModel
 from api.model import model_prediction, load_model
 from time import time
+from logtail import LogtailHandler
+import logging
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
 
 model = load_model()
+
+load_dotenv()
+LOGTAIL_TOKEN = os.getenv("LOGTAIL_TOKEN")
+LOGTAIL_HOST = os.getenv("LOGTAIL_HOST")
+
+handler = LogtailHandler(
+    source_token=LOGTAIL_TOKEN,
+    host=LOGTAIL_HOST
+)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.handlers = []
+logger.addHandler(handler)
+
+async def log_predict(input_data, output_data):
+    logger.info(
+        "/predict",
+        extra={
+            "input": input_data,
+            "output": output_data
+        }
+    )
 
 class Timer:
     def __enter__(self):
@@ -17,7 +42,6 @@ class Timer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end_time = time()
         self.elapsed_time = self.end_time - self.start_time
-
 
 @app.get("/")
 async def root():
@@ -31,11 +55,12 @@ async def predict(input_data: PredictionInput) -> PredictionOutput:
     try:
         with Timer() as timer:
             score = model_prediction(input_data, model)
-
-        return {
-            "score": score,
-            "time": timer.elapsed_time
-            }
+            output = {
+                "score": score,
+                "time": timer.elapsed_time
+                }
+            log_predict(input_data=input_data, output_data=output)
+        return output
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
