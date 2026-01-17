@@ -46,6 +46,7 @@ jobs:
         run: docker build . --file Dockerfile --tag loan-scoring-api:$(date +%s)
 
   sync-to-hub:
+    needs: docker-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
