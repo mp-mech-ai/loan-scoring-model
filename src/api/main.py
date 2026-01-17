@@ -61,7 +61,3 @@ def get_health() -> HealthCheck:
         HealthCheck: Returns a JSON response with the health status
     """
     return HealthCheck(status="OK")
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
