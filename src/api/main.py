@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, BackgroundTasks
 from api.schemas import PredictionInput, PredictionOutput, HealthCheck
 from api.model import model_prediction, load_model
 from time import time
@@ -6,7 +6,7 @@ from logtail import LogtailHandler
 import logging
 import os
 from dotenv import load_dotenv
-
+import asyncio
 app = FastAPI()
 
 model = load_model()
@@ -25,7 +25,7 @@ logger.setLevel(logging.INFO)
 logger.handlers = []
 logger.addHandler(handler)
 
-async def log_predict(input_data, output_data):
+def log_predict(input_data, output_data):
     logger.info(
         "/predict",
         extra={
@@ -51,15 +51,15 @@ async def root():
         "/predict", 
         response_model=PredictionOutput
 )
-async def predict(input_data: PredictionInput) -> PredictionOutput:
+async def predict(input_data: PredictionInput, background_tasks: BackgroundTasks) -> PredictionOutput:
     try:
         with Timer() as timer:
             score = model_prediction(input_data, model)
-            output = {
-                "score": score,
-                "time": timer.elapsed_time
-                }
-            log_predict(input_data=input_data, output_data=output)
+        output = {
+            "score": score,
+            "time": timer.elapsed_time
+            }
+        background_tasks.add_task(log_predict, input_data=input_data, output_data=output)
         return output
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
@@ -83,3 +83,6 @@ def get_health() -> HealthCheck:
         HealthCheck: Returns a JSON response with the health status
     """
     return HealthCheck(status="OK")
+
+
+
