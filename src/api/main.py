@@ -6,7 +6,7 @@ from logtail import LogtailHandler
 import logging
 import os
 from dotenv import load_dotenv
-import asyncio
+
 app = FastAPI()
 
 model = load_model()
@@ -25,11 +25,11 @@ logger.setLevel(logging.INFO)
 logger.handlers = []
 logger.addHandler(handler)
 
-def log_predict(input_data, output_data):
+def log_predict(input_data: PredictionInput, output_data: PredictionOutput):
     logger.info(
         "/predict",
         extra={
-            "input": input_data,
+            "input": input_data.model_dump(),
             "output": output_data
         }
     )
