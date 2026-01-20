@@ -36,19 +36,23 @@ main = dmc.AppShellMain(
     dash.page_container
 )
 
+def get_layout():
+    return dmc.AppShell(
+        id="appshell",
+        children=[
+            navbar,
+            main,
+        ],
+        navbar={
+            "width": 300,
+            "breakpoint": "sm"
+        },
+        padding="md",
+    )
+
 # AppShell holder
-appshell = dmc.AppShell(
-    id="appshell",
-    children=[
-        navbar,
-        main,
-    ],
-    navbar={
-        "width": 300,
-        "breakpoint": "sm"
-    },
-    padding="md",
-)
+appshell = get_layout()
+
 
 app.layout = dmc.MantineProvider(
     children=appshell, 
