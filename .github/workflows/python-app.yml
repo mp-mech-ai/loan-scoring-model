@@ -45,12 +45,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image (API + WebApp)
-        env:
-          LOGTAIL_TOKEN: ${{ secrets.LOGTAIL_TOKEN }}
-          LOGTAIL_HOST: ${{ vars.LOGTAIL_HOST }}
-          BETTERSTACK_USERNAME: ${{ secrets.BETTERSTACK_USERNAME }}
-          BETTERSTACK_PASSWORD: ${{ secrets.BETTERSTACK_PASSWORD}}
-          BETTERSTACK_HOST: ${{ secrets.BETTERSTACK_HOST }}
-          API_BASE_URL: ${{ vars.API_BASE_URL }}
-        run: docker build . --file docker-compose.yml
+
+      - name: Build API image
+        run: docker build -t loan-scoring-model-api -f Dockerfile.api .
+
+      - name: Build WebApp image
+        run: docker build -t loan-scoring-model-web -f Dockerfile.dashboard .
+
+      - name: Run API container and test
+        run: |
+          docker run -d --name test-api -p 8000:8000 \
+            -e BETTERSTACK_HOST="${{ secrets.BETTERSTACK_HOST }}" \
+            -e BETTERSTACK_USERNAME="${{ secrets.BETTERSTACK_USERNAME }}" \
+            -e BETTERSTACK_PASSWORD="${{ secrets.BETTERSTACK_PASSWORD }}" \
+            loan-scoring-model-api
+          sleep 10
+          curl -f http://localhost:8000/health
+          docker stop test-api
+          docker rm test-api
+
+      - name: Run WebApp container and test
+        run: |
+          docker run -d --name test-web -p 8050:8050 \
+            -e API_BASE_URL=http://localhost:8000 \
+            loan-scoring-model-web
+          sleep 10
+          curl -f http://localhost:8050
+          docker stop test-web
+          docker rm test-web
+
