@@ -50,7 +50,7 @@ jobs:
         run: docker build -t loan-scoring-model-api -f Dockerfile.api .
 
       - name: Build WebApp image
-        run: docker build -t loan-scoring-model-web -f Dockerfile.dashboard .
+        run: docker build -t loan-scoring-model-web -f Dockerfile.webapp .
 
       - name: Run API container and test
         run: |
