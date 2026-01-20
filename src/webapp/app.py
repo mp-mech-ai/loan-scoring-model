@@ -7,6 +7,7 @@ app = Dash(
     use_pages=True,
     suppress_callback_exceptions=True
 )
+
 server = app.server
 
 # AppShell children
@@ -74,6 +75,3 @@ def toggle_navbar(mobile_opened, desktop_opened, navbar):
         navbar["width"] = 80
         s = {"display": "none"}
         return navbar, s
-
-if __name__ == '__main__':
-    app.run(debug=True)

@@ -27,6 +27,7 @@ EXPOSE 8050
 # Start Dash using Gunicorn (recommended for production)
 CMD ["gunicorn", "webapp.app:server", \
      "--bind", "0.0.0.0:8050", \
-     "--workers", "2", \
-     "--threads", "4", \
+     "--workers", "1", \
+     "--threads", "1", \
+     "--preload", \
      "--timeout", "120"]
