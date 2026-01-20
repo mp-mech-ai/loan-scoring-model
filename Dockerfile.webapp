@@ -1,0 +1,32 @@
+FROM python:3.12-slim
+
+# Prevent Python from writing .pyc files and buffering stdout
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY pyproject.toml uv.lock ./
+
+# Copy application code
+COPY src ./src
+COPY models/ models/
+COPY data/ data/
+
+RUN pip install --upgrade pip \
+    && pip install .
+
+# Expose Dash port
+EXPOSE 8050
+
+# Start Dash using Gunicorn (recommended for production)
+CMD ["gunicorn", "webapp.app:server", \
+     "--bind", "0.0.0.0:8050", \
+     "--workers", "2", \
+     "--threads", "4", \
+     "--timeout", "120"]

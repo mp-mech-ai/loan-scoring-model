@@ -36,10 +36,10 @@ def get_row(client_id=None) -> pd.Series:
 
 load_dotenv()
 
-CH_USERNAME = os.getenv("CH_USERNAME")
-CH_PASSWORD = os.getenv("CH_PASSWORD")
-CH_HOST = os.getenv("CH_HOST")
-SOURCE_ID = os.getenv("SOURCE_ID")
+BETTERSTACK_USERNAME = os.getenv("BETTERSTACK_USERNAME")
+BETTERSTACK_PASSWORD = os.getenv("BETTERSTACK_PASSWORD")
+BETTERSTACK_HOST = os.getenv("BETTERSTACK_HOST")
+API_BASE_URL = os.getenv("API_BASE_URL")
 
 @cached(cache=TTLCache(maxsize=1, ttl=5))
 def query_betterstack(days_ago=3):
@@ -59,9 +59,9 @@ def query_betterstack(days_ago=3):
     """
     
     response = requests.post(
-        CH_HOST,
+        BETTERSTACK_HOST,
         data=query,
-        auth=(CH_USERNAME, CH_PASSWORD)
+        auth=(BETTERSTACK_USERNAME, BETTERSTACK_PASSWORD)
     )
     if response.status_code == 200:
         return response.text
@@ -151,7 +151,7 @@ def get_evidently_analysis():
 def get_api_latency() -> float:
     row = get_row().to_json()
     t0 = time()
-    response = requests.post("https://poppybunny-loan-scoring-model.hf.space/predict", data=row)
+    response = requests.post(f"{API_BASE_URL}/predict", data=row)
 
     if response.status_code == 200:
         return 1000*(time() - t0)

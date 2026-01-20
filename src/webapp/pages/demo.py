@@ -4,7 +4,7 @@ import dash
 import numpy as np
 from utils.data import get_row
 from utils.component import data_to_table
-from fastapi.testclient import TestClient   # More efficient than querying the deployed API
+from fastapi.testclient import TestClient
 from api.main import app as API
 from dash_iconify import DashIconify
 

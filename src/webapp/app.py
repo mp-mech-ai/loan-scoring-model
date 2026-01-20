@@ -7,6 +7,7 @@ app = Dash(
     use_pages=True,
     suppress_callback_exceptions=True
 )
+server = app.server
 
 # AppShell children
 navbar = dmc.AppShellNavbar(

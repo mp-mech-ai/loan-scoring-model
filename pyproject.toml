@@ -25,6 +25,7 @@ dependencies = [
     "dash-iconify>=0.1.2",
     "evidently>=0.6.0",
     "cachetools>=6.2.4",
+    "gunicorn>=23.0.0",
 ]
 
 [build-system]

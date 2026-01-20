@@ -45,21 +45,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
+      - name: Build the Docker image (API + WebApp)
         env:
           LOGTAIL_TOKEN: ${{ secrets.LOGTAIL_TOKEN }}
           LOGTAIL_HOST: ${{ vars.LOGTAIL_HOST }}
-        run: docker build . --file Dockerfile --tag loan-scoring-api:$(date +%s)
-
-  sync-to-hub:
-    needs: docker-build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          lfs: true
-      - name: Push to hub
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://poppybunny:$HF_TOKEN@huggingface.co/spaces/poppybunny/loan-scoring-model main
+          BETTERSTACK_USERNAME: ${{ secrets.BETTERSTACK_USERNAME }}
+          BETTERSTACK_PASSWORD: ${{ secrets.BETTERSTACK_PASSWORD}}
+          BETTERSTACK_HOST: ${{ secrets.BETTERSTACK_HOST }}
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: docker build . --file docker-compose.yml
