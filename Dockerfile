@@ -25,7 +25,7 @@ RUN pip install --upgrade pip \
     && pip install .
 
 # Expose API port
-EXPOSE 8000
+EXPOSE 7860
 
 # Run FastAPI with Uvicorn
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]
