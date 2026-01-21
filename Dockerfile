@@ -13,19 +13,21 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
+# Copy dependency files first (for caching)
+COPY pyproject.toml uv.lock ./
+
+RUN pip install --upgrade pip \
+&& pip install uv
+
+RUN uv sync
+
 # Copy source code, models and data
 COPY src/ src/
 COPY models/ models/
 COPY data/ data/
 
-# Copy dependency files first (for caching)
-COPY pyproject.toml uv.lock ./
-
-RUN pip install --upgrade pip \
-    && pip install .
-
 # Expose API port
-EXPOSE 7860
+EXPOSE 8000
 
 # Run FastAPI with Uvicorn
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uv", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

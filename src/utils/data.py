@@ -143,15 +143,26 @@ def get_prod_dataset():
     return prod_dataset
 
 def get_evidently_analysis():
-    from evidently.report import Report
-    from evidently.metric_preset import DataDriftPreset
-    train_dataset = get_train_dataset(drop_columns=["SK_ID_CURR"])
-    prod_dataset = get_prod_dataset()
+    on_render = os.getenv("ON_RENDER", False)
+    if on_render:
+        return  """
+        <div style="padding: 20px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #ddd;">
+            <h3>Evidently Drift Report Unavailable on Render Free Tier</h3>
+            <p>Due to resource limitations, the Evidently Drift Report cannot be generated on Render's free tier.</p>
+            <p>To access this feature, please deploy it locally.</p>
+            <p>For more information, contact me on LinkedIn <a href="https://www.linkedin.com/in/malo-potereau/">Malo POTEREAU</a>.</p>
+        </div>
+        """
+    else:
+        from evidently.report import Report
+        from evidently.metric_preset import DataDriftPreset
+        train_dataset = get_train_dataset(drop_columns=["SK_ID_CURR"])
+        prod_dataset = get_prod_dataset()
 
-    report = Report(metrics=[DataDriftPreset()])
-    report.run(reference_data=train_dataset, current_data=prod_dataset)
-    html = report.get_html()
-    return html
+        report = Report(metrics=[DataDriftPreset()])
+        report.run(reference_data=train_dataset, current_data=prod_dataset)
+        html = report.get_html()
+        return html
 
 def get_api_latency() -> float:
     row = get_row().to_json()
@@ -166,7 +177,7 @@ def get_api_latency() -> float:
 
 if __name__ == "__main__":
     # print(get_score_distribution(nb_bins=10))
-    get_api_latency()
+    print(get_evidently_analysis())
 
 
 

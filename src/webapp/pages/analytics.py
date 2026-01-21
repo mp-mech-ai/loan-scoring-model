@@ -5,6 +5,7 @@ from dash_iconify import DashIconify
 from utils.data import get_api_usage, get_evidently_analysis, get_score_distribution
 from datetime import datetime
 import pandas as pd
+
 analytics_icon = "teenyicons:area-chart-outline"
 dash.register_page(__name__, image=DashIconify(icon=analytics_icon, width=24, height=24))
 

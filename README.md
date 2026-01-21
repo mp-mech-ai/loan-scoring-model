@@ -25,7 +25,7 @@ Create an account on [BetterStack](https://betterstack.com/):
 - Now [create an API Token for this source](https://betterstack.com/docs/warehouse/querying-data/ad-hoc-sql-api/)
 - And store the username, the password and the host as `BETTERSTACK_USERNAME`, `BETTERSTACK_PASSWORD` and `BETTERSTACK_HOST` in `.env`
 
-The logs should look like this:
+The database should look like this:
 ![BetterStack Logs](assets/betterstack-log.png)
 
 ## Deploying Locally
