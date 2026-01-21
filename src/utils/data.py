@@ -6,12 +6,16 @@ import io
 import os
 from dotenv import load_dotenv
 import json
-from cachetools import cached, TTLCache
+from cachetools import cached, TTLCache, LRUCache
 
-df = pd.read_parquet("data/application_test_20cols.parquet")
+# df = pd.read_parquet("data/application_test_20cols.parquet")
 
+@cached(cache=LRUCache(maxsize=1))
+def get_df():
+    return pd.read_parquet("data/application_test_20cols.parquet")
 
 def get_train_dataset(drop_columns=None):
+    df = get_df()
     if not drop_columns:
         return df
     else:
@@ -25,6 +29,7 @@ def clean_row(row: pd.Series) -> pd.Series:
     return df_row
 
 def get_row(client_id=None) -> pd.Series:
+    df = get_df()
     if client_id:
         row = df[df["SK_ID_CURR"] == client_id]
         return clean_row(row.iloc[0])
