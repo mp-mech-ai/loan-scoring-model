@@ -1,11 +1,13 @@
 from fastapi.testclient import TestClient
 from api.main import app
-from utils.data import clean_row, get_row, df
+from utils.data import clean_row, get_row, get_df
 import pandas as pd
 import requests
 import cProfile
 
 client = TestClient(app)
+
+df = get_df()
 
 def test_df_load() -> None:
     assert isinstance(df, pd.DataFrame)
