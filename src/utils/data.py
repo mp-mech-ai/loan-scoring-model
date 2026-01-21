@@ -1,3 +1,4 @@
+from time import time
 import pandas as pd
 import numpy as np
 import requests
@@ -6,12 +7,9 @@ import os
 from dotenv import load_dotenv
 import json
 from cachetools import cached, TTLCache
-from time import time
-import matplotlib.pyplot as plt
-from evidently.report import Report
-from evidently.metric_preset import DataDriftPreset
 
 df = pd.read_parquet("data/application_test_20cols.parquet")
+
 
 def get_train_dataset(drop_columns=None):
     if not drop_columns:
@@ -140,6 +138,8 @@ def get_prod_dataset():
     return prod_dataset
 
 def get_evidently_analysis():
+    from evidently.report import Report
+    from evidently.metric_preset import DataDriftPreset
     train_dataset = get_train_dataset(drop_columns=["SK_ID_CURR"])
     prod_dataset = get_prod_dataset()
 

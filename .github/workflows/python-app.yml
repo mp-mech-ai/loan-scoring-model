@@ -51,4 +51,18 @@ jobs:
 
       - name: Build WebApp image
         run: docker build -t loan-scoring-model-web -f Dockerfile.webapp .
+  
+  sync-to-hub:
+    needs: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: git push https://poppybunny:$HF_TOKEN@huggingface.co/spaces/poppybunny/loan-scoring-model main
+
 

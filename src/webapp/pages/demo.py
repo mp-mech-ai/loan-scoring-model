@@ -4,15 +4,18 @@ import dash
 import numpy as np
 from utils.data import get_row
 from utils.component import data_to_table
-from fastapi.testclient import TestClient
-from api.main import app as API
 from dash_iconify import DashIconify
+import requests
+import os
+from dotenv import load_dotenv
 
 demo_icon = "teenyicons:adjust-horizontal-outline"
 dash.register_page(__name__, image=DashIconify(icon=demo_icon, width=24, height=24))
 dash.register_page(path="/", module=__name__, image=DashIconify(icon=demo_icon, width=24, height=24))
 
-client = TestClient(API)
+load_dotenv()
+
+API_BASE_URL = os.getenv("API_BASE_URL")
 
 client_id = dmc.NumberInput(
     label="Client ID",
@@ -90,7 +93,7 @@ def retrieve_client_info(n_clicks, input_value):
         client_row = get_row(client_id=input_value)
         payload = client_row.to_json()
 
-        response = client.post("/predict", content=payload)
+        response = requests.post(f"{API_BASE_URL}/predict", data=payload)
 
         score = 100 * response.json()["score"]
 
@@ -99,4 +102,3 @@ def retrieve_client_info(n_clicks, input_value):
         return int(np.round(score, 0)), f"{int(np.round(score, 0))}%", [client_inf]
     else:
         return 0, "", ["Search a Client..."]
-

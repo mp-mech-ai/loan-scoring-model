@@ -2,10 +2,11 @@ from dash import Dash, callback, Input, Output, State
 import dash
 import dash_mantine_components as dmc
 
+
 app = Dash(
     __name__, 
     use_pages=True,
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
 )
 
 server = app.server
@@ -79,3 +80,6 @@ def toggle_navbar(mobile_opened, desktop_opened, navbar):
         navbar["width"] = 80
         s = {"display": "none"}
         return navbar, s
+
+if __name__=="__main__":    
+    app.run(debug=True)

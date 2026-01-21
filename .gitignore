@@ -10,5 +10,8 @@ wheels/
 .venv
 .vscode
 
-# Token
+# Secrets file
 .env
+
+# Image for dev
+*.svg

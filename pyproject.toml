@@ -26,6 +26,7 @@ dependencies = [
     "evidently>=0.6.0",
     "cachetools>=6.2.4",
     "gunicorn>=23.0.0",
+    "pip>=25.3",
 ]
 
 [build-system]
