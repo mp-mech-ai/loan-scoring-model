@@ -33,7 +33,7 @@ The database should look like this:
 This project uses Docker to build and run the API and Web Application. To install Docker, follow the instructions on the [Docker website](https://www.docker.com/get-started/).
 
 Then at the root of the project, run:
-`docker compose build && docker compose up --env-file .env`
+`docker compose up -d`
 
 Then `.env` should contain the following variables:
 
