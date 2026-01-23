@@ -15,3 +15,6 @@ wheels/
 
 # Image for dev
 *.svg
+
+# Openclassrooms file
+drift_analysis.ipynb

@@ -14,3 +14,13 @@ def data_to_table(data: pd.Series) -> dmc.Table:
     body = dmc.TableTbody(rows)
 
     return dmc.Table([body])
+
+
+def get_gauge_color(value):
+    """Return modern color based on value thresholds"""
+    if value < 33:
+        return "#10b981"  # Modern emerald green
+    elif value < 66:
+        return "#f59e0b"  # Modern amber/orange
+    else:
+        return "#ef4444"  # Modern coral red

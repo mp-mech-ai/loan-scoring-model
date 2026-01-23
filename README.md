@@ -51,6 +51,7 @@ You can then access the API at `http://localhost:8000`, and the Web Application 
 
 The Web Application allows you two things:
 - In the `Demo` tab, you can query the API to retrieve the information of a specific client (based on its `SK_ID_CURR`) and see what score the model predicts for this client,
+
 ![alt text](assets/webapp-demo.png)
 
 - In the `Analytics` tab, you can see :

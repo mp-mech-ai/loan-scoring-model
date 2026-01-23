@@ -8,8 +8,6 @@ from dotenv import load_dotenv
 import json
 from cachetools import cached, TTLCache, LRUCache
 
-# df = pd.read_parquet("data/application_test_20cols.parquet")
-
 @cached(cache=LRUCache(maxsize=1))
 def get_df():
     return pd.read_parquet("data/application_test_20cols.parquet")
@@ -36,6 +34,25 @@ def get_row(client_id=None) -> pd.Series:
     else:
         return clean_row(df.sample(1).iloc[0])
 
+def get_client_distribution(nb_bins=100):
+    cols = ["DAYS_BIRTH", "DAYS_EMPLOYED", "DAYS_REGISTRATION"]
+    geom_cols = ["INCOME_PER_PERSON"]
+    df = get_df()
+    
+    bins = [np.linspace(df[col].min(), df[col].max(), nb_bins + 1) for col in cols]
+
+    bins.append(np.geomspace(df[geom_cols[0]].min(), df[geom_cols[0]].max(), nb_bins + 1))
+    
+    binned = [pd.cut(df[col], bins=bins[i], include_lowest=True) for i, col in enumerate(cols + geom_cols)]
+    
+    distribution = [binned[i].value_counts().sort_index().reset_index() for i in range(len(binned))]
+    
+    for i, col in enumerate(cols + geom_cols):
+        distribution[i].columns = ['range', 'count']
+        distribution[i]['range'] = distribution[i]['range'].astype(str)
+        distribution[i] = distribution[i].to_dict(orient="records")
+
+    return distribution
 
 load_dotenv()
 
@@ -176,8 +193,7 @@ def get_api_latency() -> float:
 
 
 if __name__ == "__main__":
-    # print(get_score_distribution(nb_bins=10))
-    print(get_evidently_analysis())
+    print(get_client_distribution())
 
 
 
