@@ -27,7 +27,7 @@ COPY data/ data/
 RUN uv sync
 
 # Expose API port
-EXPOSE 8000
+EXPOSE 7860
 
 # Run FastAPI with Uvicorn
-CMD ["uv", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]
